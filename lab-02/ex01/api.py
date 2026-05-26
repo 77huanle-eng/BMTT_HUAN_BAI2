@@ -5,6 +5,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from flask import Flask, request, jsonify
+from flask import render_template
 from cipher.caesar.caesar_cipher import CaesarCipher
 from cipher.vigenere.vigenere_cipher import VigenereCipher
 from cipher.railfence.railfence_cipher import RailFenceCipher
@@ -87,6 +88,24 @@ def transposition_decrypt():
     data = request.get_json()
     result = trans_cipher.decrypt(data['cipher_text'], int(data['key']))
     return jsonify({"decrypted_text": result}) 
+# --- Routes cho Giao diện Web (HTML) ---
+# --- Routes xử lý HTML Form (Phải khớp với action trong HTML) ---
+@app.route("/encrypt", methods=["POST"])
+def caesar_encrypt_form():
+    # Lấy dữ liệu từ FORM
+    text = request.form.get('inputPlainText')
+    key = int(request.form.get('inputKeyPlain'))
+    # Gọi logic mã hóa
+    result = CaesarCipher.encrypt_text(text, key)
+    return f"<h3>Kết quả mã hóa: {result}</h3><a href='/caesar'>Quay lại</a>"
 
+@app.route("/decrypt", methods=["POST"])
+def caesar_decrypt_form():
+    # Lấy dữ liệu từ FORM
+    text = request.form.get('inputCipherText')
+    key = int(request.form.get('inputKeyCipher'))
+    # Gọi logic giải mã
+    result = CaesarCipher.decrypt_text(text, key)
+    return f"<h3>Kết quả giải mã: {result}</h3><a href='/caesar'>Quay lại</a>"
 if __name__ == "__main__":
     app.run(debug=True)
